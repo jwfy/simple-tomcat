@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <property name="LOG_HOME" value="${app.log.dir:-logs}" />
+    <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
+    <contextName>simple-tomcat</contextName>
+
+    <include resource="logback-include.xml" />
+
+    <root level="INFO">
+        <appender-ref ref="STD-FILE" />
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>
