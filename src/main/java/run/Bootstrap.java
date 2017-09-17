@@ -38,13 +38,8 @@ public class Bootstrap {
 
         Pipeline pipeline = standardContext.getPipeline();
 
-        HeadValve headValve = new HeadValve();
-        headValve.setContainer(standardContext);
-        TestValve testValve = new TestValve();
-        testValve.setContainer(standardContext);
-
-        pipeline.addValve(headValve);
-        pipeline.addValve(testValve);
+        pipeline.addValve(new HeadValve());
+        pipeline.addValve(new TestValve());
 
         HttpConnector httpConnector = new HttpConnector(8081);
         httpConnector.setContainer(standardContext);

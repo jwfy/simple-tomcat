@@ -116,7 +116,7 @@ public class HttpConnector implements Runnable, Connector{
         if(!isRun){
             new Thread(httpProcessor, "HttpProcessor-" + processorNum).start();
             processorNum++;
-            // TODO: 17/9/17 可以加上对processor处理的请求数做一个统计 
+            // TODO: 17/9/17 可以加上对processor处理的请求数做一个统计
         }
         return httpProcessor;
     }
