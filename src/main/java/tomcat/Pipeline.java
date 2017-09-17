@@ -1,4 +1,4 @@
-package tomcat.core;
+package tomcat;
 
 
 import tomcat.http.HttpRequest;
@@ -25,8 +25,4 @@ public interface Pipeline {
     Valve[] getValves();
 
     void removeValve(Valve valve);
-
-    void setContainer(Container container);
-
-    Container getContainer();
 }

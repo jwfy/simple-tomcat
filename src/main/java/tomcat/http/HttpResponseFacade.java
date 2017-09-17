@@ -9,11 +9,11 @@ import java.util.Locale;
 /**
  * Created by junhong on 17/9/5.
  */
-public class ResponseFacade implements ServletResponse {
+public class HttpResponseFacade implements ServletResponse {
 
     private HttpResponse response;
 
-    public ResponseFacade(HttpResponse response) {
+    public HttpResponseFacade(HttpResponse response) {
         this.response = response;
     }
 

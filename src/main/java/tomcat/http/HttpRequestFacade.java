@@ -11,11 +11,11 @@ import java.util.Map;
 /**
  * Created by junhong on 17/9/5.
  */
-public class RequestFacade implements ServletRequest{
+public class HttpRequestFacade implements ServletRequest{
 
     private HttpRequest request;
 
-    public RequestFacade(HttpRequest request) {
+    public HttpRequestFacade(HttpRequest request) {
         this.request = request;
     }
 

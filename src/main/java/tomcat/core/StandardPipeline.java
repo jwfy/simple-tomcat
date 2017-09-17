@@ -1,5 +1,9 @@
 package tomcat.core;
 
+import tomcat.Contained;
+import tomcat.Container;
+import tomcat.Pipeline;
+import tomcat.Valve;
 import tomcat.http.HttpRequest;
 import tomcat.http.HttpResponse;
 
@@ -8,19 +12,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Created by junhong on 17/9/15.
+ * Created by junhong on 17/9/16.
  */
-public class StandarPipeline implements Pipeline {
+public class StandardPipeline implements Pipeline, Contained {
 
-    private Valve firstValve;
+    protected Valve firstValve = null;
 
-    private Valve basicValve;
+    protected Valve basicValve = null;
 
-    private Container container;
+    protected Container container = null;
 
-    @Override
-    public void invoke(HttpRequest request, HttpResponse response) throws IOException, ServletException {
-        getFirst().invoke(request, response);
+    public StandardPipeline(Container container) {
+        this.container = container;
     }
 
     @Override
@@ -37,16 +40,23 @@ public class StandarPipeline implements Pipeline {
 
     @Override
     public void setBasicValve(Valve valve) {
+
+        if (valve instanceof Contained)
+            ((Contained) valve).setContainer(this.container);
+
         this.basicValve = valve;
     }
 
     @Override
     public Valve getBasicValve() {
-        return null;
+        return basicValve;
     }
 
     @Override
     public void addValve(Valve valve) {
+        if (valve instanceof Contained)
+            ((Contained) valve).setContainer(this.container);
+
         if(firstValve == null) {
             firstValve = valve;
             firstValve.setNext(basicValve);
@@ -117,5 +127,10 @@ public class StandarPipeline implements Pipeline {
     @Override
     public Container getContainer() {
         return this.container;
+    }
+
+    @Override
+    public void invoke(HttpRequest request, HttpResponse response) throws IOException, ServletException {
+        getFirst().invoke(request, response);
     }
 }

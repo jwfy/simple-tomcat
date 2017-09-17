@@ -1,7 +1,7 @@
 package tomcat.http;
 
-import tomcat.core.Connector;
-import tomcat.core.Container;
+import tomcat.Connector;
+import tomcat.Container;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;

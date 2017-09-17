@@ -1,7 +1,8 @@
 package tomcat.http;
 
-import tomcat.core.Connector;
-import tomcat.core.Container;
+import tomcat.Connector;
+import tomcat.Container;
+import tomcat.manager.MappingData;
 
 import javax.servlet.*;
 import java.io.*;
@@ -27,6 +28,7 @@ public class HttpRequest implements ServletRequest {
     private Container container;
 
     private Connector connector;
+    private MappingData mappingData = new MappingData();
 
     public Connector getConnector() {
         return connector;
@@ -282,5 +284,11 @@ public class HttpRequest implements ServletRequest {
         return null;
     }
 
+    public MappingData getMappingData() {
+        return mappingData;
+    }
 
+    public void setMappingData(MappingData mappingData) {
+        this.mappingData = mappingData;
+    }
 }

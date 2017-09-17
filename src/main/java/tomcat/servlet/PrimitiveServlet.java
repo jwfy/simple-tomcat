@@ -35,9 +35,8 @@ public class PrimitiveServlet extends AbstractServlet {
 
     }
 
-
     @Override
     protected String getMessage(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-        return "<h1 style='color:red'>Hello World " + req.getParameter("Cookie") + " </h1>";
+        return "<h1 style='color:red'>Hello World</h1>";
     }
 }

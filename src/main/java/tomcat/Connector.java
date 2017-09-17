@@ -1,4 +1,4 @@
-package tomcat.core;
+package tomcat;
 
 import tomcat.http.HttpProcessor;
 import tomcat.http.HttpRequest;

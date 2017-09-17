@@ -1,4 +1,4 @@
-package tomcat.core;
+package tomcat;
 
 
 import tomcat.http.HttpRequest;
@@ -12,7 +12,11 @@ import java.io.IOException;
  */
 public interface Container {
 
+    void setParent(Container container);
+
     Container getParent() throws Exception;
+
+    Pipeline getPipeline();
 
     void addChild(Container container) throws Exception;
 

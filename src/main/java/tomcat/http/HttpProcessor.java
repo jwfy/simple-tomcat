@@ -2,9 +2,9 @@ package tomcat.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tomcat.core.Connector;
-import tomcat.core.Container;
-import tomcat.core.WrapperContainer;
+import tomcat.Connector;
+import tomcat.Container;
+import tomcat.manager.Mapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +20,8 @@ public class HttpProcessor implements Runnable {
 
     private Connector connector;
 
+    private Container container;
+
     private boolean available = false;
 
     private Socket socket;
@@ -28,6 +30,7 @@ public class HttpProcessor implements Runnable {
 
     public HttpProcessor(Connector connector) {
         this.connector = connector;
+        this.container = connector.getContainer();
     }
 
     private void processor(Socket socket){
@@ -44,23 +47,22 @@ public class HttpProcessor implements Runnable {
             httpRequest.setInputStream(inputStream);
             httpResponse.setOutputStream(outputStream);
 
+            httpRequest.setContainer(container);
+            httpResponse.setContainer(container);
+
             // 需要解析inputstream
             httpRequest.parse();
 
-            String uri = httpRequest.getUri();
-            Container container = WrapperContainer.getContainerByUri(uri);
-            assert container != null;
+            // TODO: 17/9/16 tomcat7是根据数据配置好MappingData数据
+            Mapper.mapWrapper(httpRequest);
 
             container.invoke(httpRequest, httpResponse);
-
         } catch (Exception e) {
             logger.error("processor error with:{}", e);
-            e.printStackTrace();
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
             }
 
             connector.cycleProcessor(this);

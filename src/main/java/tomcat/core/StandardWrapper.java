@@ -1,7 +1,11 @@
 package tomcat.core;
 
+import tomcat.Container;
+import tomcat.Pipeline;
+import tomcat.Wrapper;
 import tomcat.http.HttpRequest;
 import tomcat.http.HttpResponse;
+import tomcat.servlet.PrimitiveServlet;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -10,23 +14,38 @@ import java.io.IOException;
 /**
  * Created by junhong on 17/9/15.
  */
-public class StandarWrapper implements Wrapper {
+public class StandardWrapper implements Wrapper {
 
     private String name;
     private Servlet servlet;
-    private Pipeline pipeline;
+    private String servletName;
+    private Pipeline pipeline = new StandardPipeline(this);;
+    private Container parent;
 
     // TODO: 17/9/15 这里没有设置这个servlet的时候啊? 应该是需要默认启动记载的吧
 
 
+    public StandardWrapper() {
+        pipeline.setBasicValve(new StandardWrapperValve());
+    }
+
+    public void setParent(Container parent) {
+        this.parent = parent;
+    }
+
     @Override
     public Servlet alloate() {
-        return this.servlet;
+        return new PrimitiveServlet();
+    }
+
+    @Override
+    public void setServletClass(String name) {
+        this.servletName = name;
     }
 
     @Override
     public Container getParent() throws Exception {
-        return null;
+        return parent;
     }
 
     @Override
@@ -54,12 +73,17 @@ public class StandarWrapper implements Wrapper {
         return name;
     }
 
+    @Override
     public Pipeline getPipeline() {
         return pipeline;
     }
 
     public void setPipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
+    }
+
+    public Servlet getServlet() {
+        return servlet;
     }
 
     @Override

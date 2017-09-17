@@ -1,14 +1,12 @@
 package tomcat.http;
 
 
-import tomcat.core.Connector;
-import tomcat.core.Container;
+import tomcat.Connector;
+import tomcat.Container;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 /**
@@ -118,6 +116,7 @@ public class HttpConnector implements Runnable, Connector{
         if(!isRun){
             new Thread(httpProcessor, "HttpProcessor-" + processorNum).start();
             processorNum++;
+            // TODO: 17/9/17 可以加上对processor处理的请求数做一个统计 
         }
         return httpProcessor;
     }
