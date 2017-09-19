@@ -1,9 +1,6 @@
 package tomcat.core;
 
-import tomcat.Container;
-import tomcat.Context;
-import tomcat.Pipeline;
-import tomcat.Wrapper;
+import tomcat.*;
 import tomcat.http.HttpRequest;
 import tomcat.http.HttpResponse;
 
@@ -16,7 +13,7 @@ import java.util.Map;
 /**
  * Created by junhong on 17/9/16.
  */
-public class StandardContext implements Context {
+public class StandardContext implements Context, Lifecycle {
 
     private String name;
 
@@ -27,6 +24,8 @@ public class StandardContext implements Context {
     private Map<String, Container> child = null; // 儿子是儿子,和可以映射servlet的wrapper还是有区别的
 
     private Map<String, String> servletMap = null;   // 把匹配的URL规则映射到具体的wrapper名字上
+
+    private LifecycleSupport lifecycleSupport = new LifecycleSupport(this);
 
     public StandardContext() {
         pipeline.setBasicValve(new StandardContextValve());
@@ -121,5 +120,39 @@ public class StandardContext implements Context {
     @Override
     public void invoke(HttpRequest request, HttpResponse response) throws IOException, ServletException {
         pipeline.invoke(request, response);
+    }
+
+    @Override
+    public void addLifecycleListener(LifecycleListener listener) {
+        lifecycleSupport.addLifecycleListener(listener);
+    }
+
+    @Override
+    public void removeLifecycleListener(LifecycleListener listener) {
+        lifecycleSupport.removeLifecycleListener(listener);
+    }
+
+    @Override
+    public LifecycleListener[] findLifecycleListeners() {
+        return lifecycleSupport.findLifecycleListeners();
+    }
+
+    @Override
+    public void start() throws Exception {
+        lifecycleSupport.fireLifecycleEvent(BEFORE_START_EVENT, null);
+
+        lifecycleSupport.fireLifecycleEvent(START_EVENT, null);
+
+        lifecycleSupport.fireLifecycleEvent(AFTER_START_EVENT, null);
+    }
+
+    @Override
+    public void stop() throws Exception {
+
+        lifecycleSupport.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
+
+        lifecycleSupport.fireLifecycleEvent(STOP_EVENT, null);
+
+        lifecycleSupport.fireLifecycleEvent(AFTER_STOP_EVENT, null);
     }
 }

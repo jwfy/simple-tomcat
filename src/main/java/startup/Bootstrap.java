@@ -1,6 +1,7 @@
-package run;
+package startup;
 
 import tomcat.Pipeline;
+import tomcat.SimpleListener;
 import tomcat.core.StandardContext;
 import tomcat.core.StandardWrapper;
 import tomcat.http.HttpConnector;
@@ -36,6 +37,8 @@ public class Bootstrap {
             e.printStackTrace();
         }
 
+        standardContext.addLifecycleListener(new SimpleListener());
+
         Pipeline pipeline = standardContext.getPipeline();
 
         pipeline.addValve(new HeadValve());
@@ -44,6 +47,12 @@ public class Bootstrap {
         HttpConnector httpConnector = new HttpConnector(8081);
         httpConnector.setContainer(standardContext);
         httpConnector.start();
+
+        try {
+            standardContext.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
