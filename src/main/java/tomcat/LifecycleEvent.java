@@ -16,10 +16,11 @@ public final class LifecycleEvent extends EventObject {
     private String type = null;
 
     public LifecycleEvent(Lifecycle lifecycle, String type) {
-        this(null, lifecycle, type);
+        this(lifecycle, type, null);
     }
 
-    public LifecycleEvent(Object data, Lifecycle lifecycle, String type) {
+
+    public LifecycleEvent(Lifecycle lifecycle, String type, Object data) {
         super(lifecycle);
         this.data = data;
         this.lifecycle = lifecycle;

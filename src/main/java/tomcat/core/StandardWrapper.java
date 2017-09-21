@@ -7,19 +7,19 @@ import tomcat.servlet.PrimitiveServlet;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.sound.sampled.Line;
 import java.io.IOException;
 
 /**
  * Created by junhong on 17/9/15.
  */
-public class StandardWrapper implements Wrapper, Lifecycle {
+public class StandardWrapper extends LifecycleBase implements Wrapper {
 
     private String name;
     private Servlet servlet;
     private String servletName;
     private Pipeline pipeline = new StandardPipeline(this);;
     private Container parent;
-    private LifecycleSupport lifecycleSupport = new LifecycleSupport(this);
 
     // TODO: 17/9/15 这里没有设置这个servlet的时候啊? 应该是需要默认启动记载的吧
 
@@ -90,38 +90,22 @@ public class StandardWrapper implements Wrapper, Lifecycle {
         pipeline.invoke(request, response);
     }
 
-
-    @Override
-    public void addLifecycleListener(LifecycleListener listener) {
-        lifecycleSupport.addLifecycleListener(listener);
-    }
-
-    @Override
-    public void removeLifecycleListener(LifecycleListener listener) {
-        lifecycleSupport.removeLifecycleListener(listener);
-    }
-
-    @Override
-    public LifecycleListener[] findLifecycleListeners() {
-        return lifecycleSupport.findLifecycleListeners();
-    }
-
     @Override
     public void start() throws Exception {
-        lifecycleSupport.fireLifecycleEvent(BEFORE_START_EVENT, null);
+        fireLifecycleEvent(BEFORE_START_EVENT, null);
 
-        lifecycleSupport.fireLifecycleEvent(START_EVENT, null);
+        fireLifecycleEvent(START_EVENT, null);
 
-        lifecycleSupport.fireLifecycleEvent(AFTER_START_EVENT, null);
+        fireLifecycleEvent(AFTER_START_EVENT, null);
     }
 
     @Override
     public void stop() throws Exception {
 
-        lifecycleSupport.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
+        fireLifecycleEvent(BEFORE_STOP_EVENT, null);
 
-        lifecycleSupport.fireLifecycleEvent(STOP_EVENT, null);
+        fireLifecycleEvent(STOP_EVENT, null);
 
-        lifecycleSupport.fireLifecycleEvent(AFTER_STOP_EVENT, null);
+        fireLifecycleEvent(AFTER_STOP_EVENT, null);
     }
 }

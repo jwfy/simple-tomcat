@@ -1,5 +1,6 @@
 package startup;
 
+import tomcat.LifecycleListener;
 import tomcat.Pipeline;
 import tomcat.SimpleListener;
 import tomcat.core.StandardContext;
@@ -15,6 +16,8 @@ public class Bootstrap {
 
     public static void main(String[] args){
 
+        LifecycleListener listener = new SimpleListener();
+
         StandardContext standardContext = new StandardContext();
         standardContext.setName("standarContext");
 
@@ -24,10 +27,13 @@ public class Bootstrap {
         StandardWrapper w1 = new StandardWrapper();
         w1.setName("primitive");
         w1.setServletClass("PrimitiveServlet");
+        w1.addLifecycleListener(listener);
 
         StandardWrapper w2 = new StandardWrapper();
         w2.setName("basic");
         w2.setServletClass("BasicServlet");
+        w2.addLifecycleListener(listener);
+
         // 以上两个wrap已经构造好了
 
         try {
@@ -37,7 +43,7 @@ public class Bootstrap {
             e.printStackTrace();
         }
 
-        standardContext.addLifecycleListener(new SimpleListener());
+        standardContext.addLifecycleListener(listener);
 
         Pipeline pipeline = standardContext.getPipeline();
 

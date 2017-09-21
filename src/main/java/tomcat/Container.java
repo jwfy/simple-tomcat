@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Created by junhong on 17/9/10.
  */
-public interface Container {
+public interface Container extends Lifecycle {
 
     void setParent(Container container);
 

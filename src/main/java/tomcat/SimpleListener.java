@@ -12,7 +12,7 @@ public class SimpleListener implements LifecycleListener {
 
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
-        Lifecycle lifecycle = event.getLifecycle();
-        logger.info("SimpleListener event with :{}", event.getType());
+        Container container = (Container)event.getLifecycle();
+        logger.info("SimpleListener name:{}, event :{}", container.getName(), event.getType());
     }
 }

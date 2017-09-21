@@ -21,7 +21,7 @@ java.lang.Exception: don't find wrapper container with /favicon.ico
 ## simple-connect
 
 - 能够解析基本的http请求头部信息,`但是并不完整`
-- 学习和模范Tomcat4 httpconnect和process对socket的处理方式
+- 学习和模拟Tomcat4 httpconnect和process对socket的处理方式
 
 ## simple-container
 
@@ -30,9 +30,12 @@ java.lang.Exception: don't find wrapper container with /favicon.ico
 
 ## simple-lifecycle
 
-还在进行中,就如同现在的代码就单纯的应用层面而言完全可以不需要加上生命周期
-所有的容器都在bootstrap启动了,但是这样肯定是不行的,如何监管各种容器
-不仅仅是容器,各种模块都是可以被加入到监管中的,只需要继承LifecycleListener接口就好了
+本demo中只实现了一个简单的生命周期的监听过程,打印出日志,直接启动即可
+此处并没有实现Tomcat4 5中的LifeSupport类,而是参照7,直接写到了`LifecycleBase`中,每个组件都可以直接继承
+
+## elegant-close
+
+当程序运行,需要关闭,如何做到优雅关闭的呢?
 
 ## 可以完善改进
 
