@@ -32,6 +32,19 @@ java.lang.Exception: don't find wrapper container with /favicon.ico
 
 本demo中只实现了一个简单的生命周期的监听过程,打印出日志,直接启动即可
 此处并没有实现Tomcat4 5中的LifeSupport类,而是参照7,直接写到了`LifecycleBase`中,每个组件都可以直接继承
+日志如下
+```
+2017-09-21 23:24:38,252 INFO  [main] tomcat.SimpleListener - SimpleListener name:standarContext, event :before_start
+2017-09-21 23:24:38,265 INFO  [main] tomcat.SimpleListener - SimpleListener name:standarContext, event :start
+2017-09-21 23:24:38,266 INFO  [main] tomcat.SimpleListener - SimpleListener name:primitive, event :before_start
+2017-09-21 23:24:38,266 INFO  [main] tomcat.SimpleListener - SimpleListener name:primitive, event :start
+2017-09-21 23:24:38,266 INFO  [main] tomcat.SimpleListener - SimpleListener name:primitive, event :after_start
+2017-09-21 23:24:38,267 INFO  [main] tomcat.SimpleListener - SimpleListener name:basic, event :before_start
+2017-09-21 23:24:38,267 INFO  [main] tomcat.SimpleListener - SimpleListener name:basic, event :start
+2017-09-21 23:24:38,267 INFO  [main] tomcat.SimpleListener - SimpleListener name:basic, event :after_start
+2017-09-21 23:24:38,267 INFO  [main] tomcat.SimpleListener - SimpleListener name:standarContext, event :after_start
+
+```
 
 ## elegant-close
 
