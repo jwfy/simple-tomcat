@@ -1,5 +1,8 @@
 package startup;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tomcat.Catalina;
 import tomcat.LifecycleListener;
 import tomcat.Pipeline;
 import tomcat.SimpleListener;
@@ -14,51 +17,35 @@ import tomcat.valve.TestValve;
  */
 public class Bootstrap {
 
+    private static Logger logger = LoggerFactory.getLogger(Bootstrap.class);
+
+    private Catalina catalina;
+
+    public void start(){
+        catalina = new Catalina();
+        catalina.start();
+    }
+
+    public void stop(){
+        if(catalina != null) {
+            catalina.stop();
+            return;
+        }
+        logger.error("catalina don't start");
+    }
+
     public static void main(String[] args){
 
-        LifecycleListener listener = new SimpleListener();
+        String command = "start";
+        if(args.length >=1)
+            command = args[args.length -1];
 
-        StandardContext standardContext = new StandardContext();
-        standardContext.setName("standarContext");
+        Bootstrap bootstrap = new Bootstrap();
+        if("start".equals(command))
+            bootstrap.start();
+        else
+            bootstrap.stop();
 
-        standardContext.addServletMapping("/primitive", "primitive");
-        standardContext.addServletMapping("/basic", "basic");
-
-        StandardWrapper w1 = new StandardWrapper();
-        w1.setName("primitive");
-        w1.setServletClass("PrimitiveServlet");
-        w1.addLifecycleListener(listener);
-
-        StandardWrapper w2 = new StandardWrapper();
-        w2.setName("basic");
-        w2.setServletClass("BasicServlet");
-        w2.addLifecycleListener(listener);
-
-        // 以上两个wrap已经构造好了
-
-        try {
-            standardContext.addChild(w1);
-            standardContext.addChild(w2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        standardContext.addLifecycleListener(listener);
-
-        Pipeline pipeline = standardContext.getPipeline();
-
-        pipeline.addValve(new HeadValve());
-        pipeline.addValve(new TestValve());
-
-        HttpConnector httpConnector = new HttpConnector(8081);
-        httpConnector.setContainer(standardContext);
-        httpConnector.start();
-
-        try {
-            standardContext.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 }
