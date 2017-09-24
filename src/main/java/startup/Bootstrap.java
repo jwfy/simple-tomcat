@@ -2,15 +2,15 @@ package startup;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tomcat.Catalina;
-import tomcat.LifecycleListener;
-import tomcat.Pipeline;
-import tomcat.SimpleListener;
+import servlet.PrimitiveServlet;
+import tomcat.*;
 import tomcat.core.StandardContext;
 import tomcat.core.StandardWrapper;
 import tomcat.http.HttpConnector;
 import tomcat.valve.HeadValve;
 import tomcat.valve.TestValve;
+
+import javax.servlet.Servlet;
 
 /**
  * Created by junhong on 17/9/7.
@@ -45,7 +45,6 @@ public class Bootstrap {
             bootstrap.start();
         else
             bootstrap.stop();
-
     }
 
 }

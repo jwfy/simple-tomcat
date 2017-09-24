@@ -17,6 +17,7 @@ public class Catalina {
 
     public void start(){
         LifecycleListener listener = new SimpleListener();
+        ClassLoader classLoader = new DefaultClassLoader();
 
         standardContext = new StandardContext();
         standardContext.setName("standarContext");
@@ -26,12 +27,15 @@ public class Catalina {
 
         StandardWrapper w1 = new StandardWrapper();
         w1.setName("primitive");
-        w1.setServletClass("PrimitiveServlet");
+        w1.setServletClass("servlet.PrimitiveServlet");
+        w1.setClassLoader(classLoader);
         w1.addLifecycleListener(listener);
 
         StandardWrapper w2 = new StandardWrapper();
         w2.setName("basic");
-        w2.setServletClass("BasicServlet");
+        w2.setServletClass("servlet.BasicServlet");
+        // 如果这里不设置其classloader,则会提示未找到对应的classload,直接处理失败
+        w2.setClassLoader(classLoader);
         w2.addLifecycleListener(listener);
 
         // 以上两个wrap已经构造好了

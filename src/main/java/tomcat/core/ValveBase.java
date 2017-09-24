@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Created by junhong on 17/9/16.
  */
-public abstract class BaseValve implements Valve, Contained {
+public abstract class ValveBase implements Valve, Contained {
 
     protected Valve next = null;
     protected Container container = null;

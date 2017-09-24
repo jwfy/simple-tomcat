@@ -15,7 +15,9 @@ public abstract class LifecycleBase implements Lifecycle {
 
     protected final List<LifecycleListener> lifecycleListenerList = new ArrayList<>();
 
-    private LifecycleState state = LifecycleState.NEW;
+    protected LifecycleState state = LifecycleState.NEW;
+
+    protected ClassLoader classLoader;
 
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
@@ -51,6 +53,14 @@ public abstract class LifecycleBase implements Lifecycle {
     @Override
     public String getStateName() {
         return state.getLifecycleEvent();
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 
     public abstract void start() throws Exception;

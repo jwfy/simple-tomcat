@@ -17,4 +17,6 @@ public interface Wrapper extends Container {
     // 设置该wrap包含的servlet
     void setServletClass(String name);
 
+    String getServletClass();
+
 }

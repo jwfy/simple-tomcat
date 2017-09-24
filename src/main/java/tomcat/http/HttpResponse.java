@@ -51,40 +51,6 @@ public class HttpResponse implements ServletResponse {
         this.httpRequest = httpRequest;
     }
 
-    public void returnMessage(){
-        String messageFormat = "HTTP/1.1 200 OK\r\n" +
-                "Content-Type: text/html\r\n" +
-                "Content-Length: %d\r\n" +
-                "Server-name: junhong\r\n" +
-                "\r\n" +
-                "%s";
-        String content = getContent();
-        String message = String.format(messageFormat, content.length(), content);
-
-        try {
-            this.outputStream.write(message.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String getContent(){
-        if(this.httpRequest == null)
-            throw new NullPointerException("httprequest is null");
-        StringBuffer sb = new StringBuffer();
-
-        sb.append("<h4>URL : ").append(this.httpRequest.getUri()).append("</h4>");
-        sb.append("<h4>Method : ").append(this.httpRequest.getMethod()).append("</h4>");
-
-        Iterator it = this.httpRequest.getRequestHead().entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry<String, String> entry = (Map.Entry<String, String>) it.next();
-            sb.append("<h5>").append(entry.getKey()).append(" : ").append(entry.getValue()).append("</h5>");
-        }
-
-        return sb.toString();
-    }
-
     @Override
     public String getCharacterEncoding() {
         return null;

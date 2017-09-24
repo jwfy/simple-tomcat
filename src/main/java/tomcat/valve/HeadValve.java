@@ -2,7 +2,7 @@ package tomcat.valve;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tomcat.core.BaseValve;
+import tomcat.core.ValveBase;
 import tomcat.Container;
 import tomcat.http.HttpRequest;
 import tomcat.http.HttpResponse;
@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by junhong on 17/9/16.
  */
-public class HeadValve extends BaseValve {
+public class HeadValve extends ValveBase {
 
     private Logger logger = LoggerFactory.getLogger(HeadValve.class);
 

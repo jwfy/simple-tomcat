@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Created by junhong on 17/9/16.
  */
-public class StandardContextValve extends BaseValve {
+public class StandardContextValve extends ValveBase {
 
     private Logger logger = LoggerFactory.getLogger(StandardContextValve.class);
 

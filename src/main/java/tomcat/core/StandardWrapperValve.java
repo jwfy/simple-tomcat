@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * Created by junhong on 17/9/15.
  */
-public class StandardWrapperValve extends BaseValve {
+public class StandardWrapperValve extends ValveBase {
 
     private Logger logger = LoggerFactory.getLogger(StandardWrapperValve.class);
 
