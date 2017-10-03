@@ -1,6 +1,8 @@
 package tomcat;
 
 import tomcat.core.StandardContext;
+import tomcat.core.StandardServer;
+import tomcat.core.StandardService;
 import tomcat.core.StandardWrapper;
 import tomcat.http.HttpConnector;
 import tomcat.valve.HeadValve;
@@ -16,50 +18,24 @@ public class Catalina {
     private Thread shutdownHook = null;
 
     public void start(){
+
         LifecycleListener listener = new SimpleListener();
-        ClassLoader classLoader = new DefaultClassLoader();
 
-        standardContext = new StandardContext();
-        standardContext.setName("standarContext");
+        Server server = new StandardServer();
 
-        standardContext.addServletMapping("/primitive", "primitive");
-        standardContext.addServletMapping("/basic", "basic");
-
-        StandardWrapper w1 = new StandardWrapper();
-        w1.setName("primitive");
-        w1.setServletClass("servlet.PrimitiveServlet");
-        w1.setClassLoader(classLoader);
-        w1.addLifecycleListener(listener);
-
-        StandardWrapper w2 = new StandardWrapper();
-        w2.setName("basic");
-        w2.setServletClass("servlet.BasicServlet");
-        // 如果这里不设置其classloader,则会提示未找到对应的classload,直接处理失败
-        w2.setClassLoader(classLoader);
-        w2.addLifecycleListener(listener);
-
-        // 以上两个wrap已经构造好了
-
-        try {
-            standardContext.addChild(w1);
-            standardContext.addChild(w2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        standardContext.addLifecycleListener(listener);
-
-        Pipeline pipeline = standardContext.getPipeline();
-
-        pipeline.addValve(new HeadValve());
-        pipeline.addValve(new TestValve());
+        Service service = new StandardService(server);
 
         HttpConnector httpConnector = new HttpConnector(8081);
-        httpConnector.setContainer(standardContext);
-        httpConnector.start();
+        httpConnector.setContainer(service.getContext());
+        // TODO: 17/10/3 从这个service.getContext中强制初始化了包含的容器是context,而不是engine
+        service.addConnector(httpConnector);
+
+        // TODO: 17/10/3 如果需要添加不同的connection,则直接添加即可
+
+        server.addService(service);
 
         try {
-            standardContext.start();
+            server.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

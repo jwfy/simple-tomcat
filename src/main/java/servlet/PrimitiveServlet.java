@@ -16,16 +16,6 @@ public class PrimitiveServlet extends AbstractServlet {
             "%s";
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        System.out.println("init");
-    }
-
-    @Override
-    public ServletConfig getServletConfig() {
-        return null;
-    }
-
-    @Override
     public String getServletInfo() {
         return null;
     }
@@ -37,6 +27,9 @@ public class PrimitiveServlet extends AbstractServlet {
 
     @Override
     protected String getMessage(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-        return "<h1 style='color:red'>Hello World</h1>";
+
+        String configName = this.config.getServletContext().getServletContextName();
+        // TODO: 17/10/3 这样就可以通过一个config获取到容器所需的所有上下文内容了
+        return "<h1 style='color:red'>Hello World " + configName + "</h1>";
     }
 }

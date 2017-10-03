@@ -19,17 +19,17 @@ java.lang.Exception: don't find wrapper container with /favicon.ico
 
 通过切换tag分支运行相关功能
 
-## simple-connect
+## simple-connect  2017-09-16 13:08:21
 
 - 能够解析基本的http请求头部信息,`但是并不完整`
 - 学习和模拟Tomcat4 httpconnect和process对socket的处理方式
 
-## simple-container
+## simple-container  2017-09-17 15:05:09
 
 - Tomcat容器本身包含了4层,但是只实现了context和wrapper两层
 - 请求和容器拆开
 
-## simple-lifecycle
+## simple-lifecycle  2017-09-21 23:33:23
 
 本demo中只实现了一个简单的生命周期的监听过程,打印出日志,直接启动即可
 此处并没有实现Tomcat4 5中的LifeSupport类,而是参照7,直接写到了`LifecycleBase`中,每个组件都可以直接继承
@@ -46,6 +46,16 @@ java.lang.Exception: don't find wrapper container with /favicon.ico
 2017-09-21 23:24:38,267 INFO  [main] tomcat.SimpleListener - SimpleListener name:standarContext, event :after_start
 
 ```
+
+## TODO simple-server 2017年10月03日23:31:34
+
+进一步加上server和service以及ApplicationContextFacade和具体的servlet的上下文交互,后续完善`优雅关闭`
+测试了一下servlet获取上下文的内容,可键入 `http://127.0.0.1:8081/primitive/index.html`,出现如下内容
+
+```
+Hello World ApplicationContextFacade
+```
+
 
 ## elegant-close
 

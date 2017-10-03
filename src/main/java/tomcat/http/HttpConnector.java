@@ -3,6 +3,9 @@ package tomcat.http;
 
 import tomcat.Connector;
 import tomcat.Container;
+import tomcat.LifecycleListener;
+import tomcat.LifecycleState;
+import tomcat.core.LifecycleBase;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -16,7 +19,7 @@ import java.util.Stack;
  *
  * 此外还维护了一个HttpProcessor的集合,这是1对多的关系
  */
-public class HttpConnector implements Runnable, Connector{
+public class HttpConnector extends LifecycleBase implements Runnable, Connector{
 
     private ServerSocket serverSocket;
 
@@ -89,6 +92,14 @@ public class HttpConnector implements Runnable, Connector{
             HttpProcessor httpProcessor = createProcessor();
             httpProcessor.assign(socket);
         }
+
+        if(serverSocket != null){
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void httpConnectorThread(){
@@ -131,5 +142,11 @@ public class HttpConnector implements Runnable, Connector{
         // TODO: 17/9/10 书上说这时候还会有生命周期的操作和判断
         httpConnectorThread();
         newProcessor();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        // TODO: 17/10/3 这里肯定就是切掉流量的入口
+        isAccept = false;
     }
 }

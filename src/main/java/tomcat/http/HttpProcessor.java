@@ -34,7 +34,7 @@ public class HttpProcessor implements Runnable {
     }
 
     private void processor(Socket socket){
-        logger.info("processor deal socket with :{}", socket);
+        // logger.info("processor deal socket with :{}", socket);
 
         HttpRequest httpRequest = connector.createRequest();
         HttpResponse httpResponse = connector.createResponse();
@@ -54,9 +54,13 @@ public class HttpProcessor implements Runnable {
             httpRequest.parse();
 
             // TODO: 17/9/16 tomcat7是根据数据配置好MappingData数据
-            Mapper.mapWrapper(httpRequest);
-
-            container.invoke(httpRequest, httpResponse);
+            String url = httpRequest.getUri();
+            if(url.endsWith("ico") || url.endsWith("gif") || url.endsWith("jpg")) {
+                logger.error("processor don't deal url:{}, socket:{}", url, socket);
+            }else {
+                Mapper.mapWrapper(httpRequest);
+                container.invoke(httpRequest, httpResponse);
+            }
         } catch (Exception e) {
             logger.error("processor error with:{}", e);
         } finally {
@@ -95,7 +99,7 @@ public class HttpProcessor implements Runnable {
                 e.printStackTrace();
             }
         }
-        logger.info("assign add new socket with :{}, avaliable:{}", socket, available);
+        // logger.info("assign add new socket with :{}, avaliable:{}", socket, available);
 
         this.socket = socket;
         available = true;

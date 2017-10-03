@@ -19,4 +19,6 @@ public interface Wrapper extends Container {
 
     String getServletClass();
 
+    void addInitParameter(String name, String value);
+
 }

@@ -12,16 +12,6 @@ import java.io.IOException;
 public class BasicServlet extends AbstractServlet {
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-
-    }
-
-    @Override
-    public ServletConfig getServletConfig() {
-        return null;
-    }
-
-    @Override
     public String getServletInfo() {
         return null;
     }

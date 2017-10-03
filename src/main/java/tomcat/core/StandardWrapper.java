@@ -13,7 +13,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 /**
  * Created by junhong on 17/9/15.
@@ -28,6 +31,8 @@ public class StandardWrapper extends LifecycleBase implements ServletConfig, Wra
     private Pipeline pipeline = new StandardPipeline(this);;
     private Container parent;
     private boolean singleThreadModel = false;
+    private final StandardWrapperFacade facade = new StandardWrapperFacade(this);
+    protected HashMap<String, String> parameters = new HashMap<>();
 
     // TODO: 17/9/15 这里没有设置这个servlet的时候啊? 应该是需要默认启动记载的吧
 
@@ -67,6 +72,10 @@ public class StandardWrapper extends LifecycleBase implements ServletConfig, Wra
             Class clazz = classLoader.loadClass(servletClass);
             Object obj = clazz.newInstance();
             servlet = (Servlet) obj;
+
+            servlet.init(facade);
+            // 这一步是把容器和servlet挂靠上
+
             logger.info("load service with classload:{}, service:{}, costtime:{}", clazz.getClassLoader().toString(),
                     servlet.toString(), System.currentTimeMillis() - time1);
         } catch (Exception e){
@@ -163,16 +172,28 @@ public class StandardWrapper extends LifecycleBase implements ServletConfig, Wra
 
     @Override
     public ServletContext getServletContext() {
-        return null;
+        // 这一步就把servlet和context给绑定了,上面的init是和wrap绑定
+        // 这样一来就可以很方便的在单独的servlet实现类中获取各种所需的上下文了
+        if(parent == null)
+            return null;
+        else if(!(parent instanceof Context))
+            return null;
+        else
+            return ((Context) parent).getServletContext();
+    }
+
+    @Override
+    public void addInitParameter(String name, String value) {
+        parameters.put(name, value);
     }
 
     @Override
     public String getInitParameter(String name) {
-        return null;
+        return parameters.get(name);
     }
 
     @Override
     public Enumeration<String> getInitParameterNames() {
-        return null;
+        return Collections.enumeration(parameters.keySet());
     }
 }

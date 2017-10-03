@@ -4,10 +4,10 @@ import tomcat.*;
 import tomcat.http.HttpRequest;
 import tomcat.http.HttpResponse;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -24,6 +24,8 @@ public class StandardContext extends LifecycleBase implements Context {
     private Map<String, Container> child = null; // 儿子是儿子,和可以映射servlet的wrapper还是有区别的
 
     private Map<String, String> servletMap = null;   // 把匹配的URL规则映射到具体的wrapper名字上
+
+    private ApplicationContext context = null;
 
     public StandardContext() {
         pipeline.setBasicValve(new StandardContextValve());
@@ -73,13 +75,10 @@ public class StandardContext extends LifecycleBase implements Context {
 
     @Override
     public Container findChild(String name) {
-        Iterator it = child.entrySet().iterator();
 
-        while (it.hasNext()) {
-            Map.Entry<String, Container> entry = (Map.Entry<String, Container>) it.next();
-            if (entry.getKey().equals(name)) {
+        for(Map.Entry<String, Container> entry: child.entrySet()){
+            if(entry.getKey().equalsIgnoreCase(name))
                 return entry.getValue();
-            }
         }
         return null;
     }
@@ -118,6 +117,14 @@ public class StandardContext extends LifecycleBase implements Context {
     @Override
     public void invoke(HttpRequest request, HttpResponse response) throws IOException, ServletException {
         pipeline.invoke(request, response);
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+        if (context == null) {
+            context = new ApplicationContext(this);
+        }
+        return context.getFacade();
     }
 
     public void start() throws Exception {
