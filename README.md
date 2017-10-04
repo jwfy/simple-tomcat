@@ -57,6 +57,11 @@ Hello World ApplicationContextFacade
 ```
 当前可以进行优雅关闭,但是在Tomcat中是实现了`stop`和`stopserver`两个方法,并且在server中是支持通过socket关闭server服务的请求
 
+### Tomcat 退出方法以及注意事项
+
+- Tomcat为了防止异常情况（GC未知错误未被捕获等）使用了ShutHook的方式退出（也是本demo的方式）
+- 已经启动的server当做服务端,另外创建一个server使用相同的ip和端口,当做客户端,发送socket请求,通过网络关闭server（通过sh的方式就是该方法）
+- 但是如果在服务中有使用了线程池,Tomcat本身关闭时是不会杀掉线程池（导致Tomcat无法完全正常关闭,甚至出现僵尸进程）,解决办法就是设置线程池的线程为`daemon`
 
 ## 可以完善改进
 
