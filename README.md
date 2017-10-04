@@ -47,7 +47,7 @@ java.lang.Exception: don't find wrapper container with /favicon.ico
 
 ```
 
-## TODO simple-server 2017年10月03日23:31:34
+## simple-server 2017年10月04日22:46:15
 
 进一步加上server和service以及ApplicationContextFacade和具体的servlet的上下文交互,后续完善`优雅关闭`
 测试了一下servlet获取上下文的内容,可键入 `http://127.0.0.1:8081/primitive/index.html`,出现如下内容
@@ -55,11 +55,8 @@ java.lang.Exception: don't find wrapper container with /favicon.ico
 ```
 Hello World ApplicationContextFacade
 ```
+当前可以进行优雅关闭,但是在Tomcat中是实现了`stop`和`stopserver`两个方法,并且在server中是支持通过socket关闭server服务的请求
 
-
-## elegant-close
-
-当程序运行,需要关闭,如何做到优雅关闭的呢?
 
 ## 可以完善改进
 

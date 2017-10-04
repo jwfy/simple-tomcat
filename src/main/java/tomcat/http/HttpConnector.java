@@ -1,6 +1,8 @@
 package tomcat.http;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tomcat.Connector;
 import tomcat.Container;
 import tomcat.LifecycleListener;
@@ -20,6 +22,8 @@ import java.util.Stack;
  * 此外还维护了一个HttpProcessor的集合,这是1对多的关系
  */
 public class HttpConnector extends LifecycleBase implements Runnable, Connector{
+
+    private Logger logger = LoggerFactory.getLogger(HttpConnector.class);
 
     private ServerSocket serverSocket;
 
@@ -148,5 +152,6 @@ public class HttpConnector extends LifecycleBase implements Runnable, Connector{
     public void stop() throws Exception {
         // TODO: 17/10/3 这里肯定就是切掉流量的入口
         isAccept = false;
+        logger.info("stop and don't receive request");
     }
 }

@@ -1,5 +1,7 @@
 package tomcat.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tomcat.*;
 import tomcat.http.HttpRequest;
 import tomcat.http.HttpResponse;
@@ -15,6 +17,8 @@ import java.util.Map;
  */
 public class StandardContext extends LifecycleBase implements Context {
 
+    private Logger logger = LoggerFactory.getLogger(StandardContext.class);
+
     private String name;
 
     private Pipeline pipeline = new StandardPipeline(this);;
@@ -27,15 +31,20 @@ public class StandardContext extends LifecycleBase implements Context {
 
     private ApplicationContext context = null;
 
-    public StandardContext() {
-        pipeline.setBasicValve(new StandardContextValve());
-        child = new HashMap<>();
-        servletMap = new HashMap<>();
+    private Service service = null;
+    // 在Tomcat中这个是隶属于engine中的,但是该项目是simple,只有两层容器结构
+    // 但是在这里是直接赋值好的
+
+    public StandardContext(Service service) {
+        this.service = service;
+        this.pipeline.setBasicValve(new StandardContextValve());
+        this.child = new HashMap<>();
+        this.servletMap = new HashMap<>();
     }
 
-    public StandardContext(String name) {
-        this();
-        this.name = name;
+    @Override
+    public Service getService() {
+        return service;
     }
 
     @Override
@@ -142,6 +151,8 @@ public class StandardContext extends LifecycleBase implements Context {
     }
 
     public void stop() throws Exception {
+
+        logger.info("stop");
 
         fireLifecycleEvent(BEFORE_STOP_EVENT, null);
 

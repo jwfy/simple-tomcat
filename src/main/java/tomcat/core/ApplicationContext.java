@@ -22,13 +22,13 @@ public class ApplicationContext implements ServletContext {
 
     private ServletContext facade = new ApplicationContextFacade(this);
 
-    private final StandardContext standardContext;
+    private final StandardContext context;
 
-    private Service service;
+    private final Service service;
 
     public ApplicationContext(StandardContext standardContext) {
-        this.standardContext = standardContext;
-        // TODO: 17/9/30 设置service
+        this.context = standardContext;
+        this.service = standardContext.getService();
     }
 
     public ServletContext getFacade() {
@@ -37,6 +37,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public String getContextPath() {
+        // TODO: 17/10/4 这都是从StandardContext中获取到的,也就是说StandardContext必须得有相关接口方法并实现
         return null;
     }
 

@@ -17,4 +17,6 @@ public interface Context extends Container{
 
     ServletContext getServletContext();
 
+    Service getService();
+
 }

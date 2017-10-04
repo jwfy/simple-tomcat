@@ -32,10 +32,11 @@ public class StandardService extends LifecycleBase implements Service {
 
     public StandardService(Server server) {
         this.server = server;
-        this.context = new StandardContext();
+        this.context = new StandardContext(this);
         this.connectorList = new ArrayList<>();
 
         initContext();
+        // TODO: 17/10/4 模拟digester 操作,如果是更高层次的操作,则该代码需要移至catalina里面
     }
 
     private void initContext(){

@@ -1,19 +1,15 @@
 package tomcat;
 
-import tomcat.core.StandardContext;
 import tomcat.core.StandardServer;
 import tomcat.core.StandardService;
-import tomcat.core.StandardWrapper;
 import tomcat.http.HttpConnector;
-import tomcat.valve.HeadValve;
-import tomcat.valve.TestValve;
 
 /**
  * Created by junhong on 17/9/22.
  */
 public class Catalina {
 
-    private StandardContext standardContext;
+    private Server server = null;
 
     private Thread shutdownHook = null;
 
@@ -21,7 +17,8 @@ public class Catalina {
 
         LifecycleListener listener = new SimpleListener();
 
-        Server server = new StandardServer();
+        server = new StandardServer();
+        server.addLifecycleListener(listener);
 
         Service service = new StandardService(server);
 
@@ -45,11 +42,14 @@ public class Catalina {
         Runtime.getRuntime().addShutdownHook(shutdownHook);
     }
 
+    public Server getServer() {
+        return server;
+    }
+
     public void stop(){
-        if(shutdownHook != null)
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
         try {
-            standardContext.stop();
+            if(getServer()!= null)
+                server.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
