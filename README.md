@@ -63,11 +63,21 @@ Hello World ApplicationContextFacade
 - 已经启动的server当做服务端,另外创建一个server使用相同的ip和端口,当做客户端,发送socket请求,通过网络关闭server（通过sh的方式就是该方法）
 - 但是如果在服务中有使用了线程池,Tomcat本身关闭时是不会杀掉线程池（导致Tomcat无法完全正常关闭,甚至出现僵尸进程）,解决办法就是设置线程池的线程为`daemon`
 
+## TODO update-lifecycle 2017年10月10日23:09:20
+
+提取出containerbase,关于生命周期的设置以及统一的守护线程（更多的是重载和session类似的功能）
+
+在最新的Tomcat7中的containerbase中就有`ContainerBackgroundProcessor`内部类,设置容器可以执行的守护线程
+
 ## 可以完善改进
 
 - 解析请求更加细化
 - 采用NIO读写socket
 - digester读写xml
+
+## 认识到的东西
+
+- jmx
 
 
 
