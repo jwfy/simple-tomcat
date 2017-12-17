@@ -4,12 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tomcat.Connector;
 import tomcat.Container;
-import tomcat.manager.Mapper;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.util.Random;
 
 /**
  * Created by junhong on 17/9/7.
@@ -24,7 +23,7 @@ public class HttpProcessor implements Runnable {
 
     private boolean available = false;
 
-    private Socket socket;
+    private SocketChannel socketChannel;
 
     private boolean isRun = false; // 判断其是否处于运行状态
 
@@ -33,88 +32,46 @@ public class HttpProcessor implements Runnable {
         this.container = connector.getContainer();
     }
 
-    private void processor(Socket socket){
-        // logger.info("processor deal socket with :{}", socket);
+    public HttpProcessor(SocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
+    }
 
-        HttpRequest httpRequest = connector.createRequest();
-        HttpResponse httpResponse = connector.createResponse();
-        httpResponse.setHttpRequest(httpRequest);
+    private void parse(){
+        String successHead = "HTTP/1.1 200 OK\r\n" +
+                "Content-Type: text/html\r\n" +
+                "Server-name: junhong\r\n" +
+                "\r\n" +
+                "%s";
 
+        Random random = new Random();
+        long sleepTime = random.nextInt(500);
+        logger.info("write message and costtime：{}", sleepTime);
         try {
-            InputStream inputStream = socket.getInputStream();
-            OutputStream outputStream = socket.getOutputStream();
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-            httpRequest.setInputStream(inputStream);
-            httpResponse.setOutputStream(outputStream);
-
-            httpRequest.setContainer(container);
-            httpResponse.setContainer(container);
-
-            // 需要解析inputstream
-            httpRequest.parse();
-
-            // TODO: 17/9/16 tomcat7是根据数据配置好MappingData数据
-            String url = httpRequest.getUri();
-            if(url.endsWith("ico") || url.endsWith("gif") || url.endsWith("jpg")) {
-                logger.error("processor don't deal url:{}, socket:{}", url, socket);
-            }else {
-                Mapper.mapWrapper(httpRequest);
-                container.invoke(httpRequest, httpResponse);
-            }
-        } catch (Exception e) {
-            logger.error("processor error with:{}", e);
+        String message = String.format(successHead, "Hello World");
+        try {
+            socketChannel.write(ByteBuffer.wrap(message.getBytes()));
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-            }
-
-            connector.cycleProcessor(this);
-        }
-
-    }
-
-    private synchronized Socket await(){
-        while (!available){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if(socketChannel != null) {
+                try {
+                    socketChannel.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
-        Socket socket = this.socket;
-        this.socket = null; // 当前socket设置为null
-        available = false;
-        notifyAll();
-        return socket;
     }
 
-    public synchronized void assign(Socket socket){
-
-        while (available){
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        // logger.info("assign add new socket with :{}, avaliable:{}", socket, available);
-
-        this.socket = socket;
-        available = true;
-        notifyAll();
-    }
 
     @Override
     public void run() {
-        isRun = true;
-
-        while (true){
-            Socket socket = await();
-            if(socket == null) continue;
-            processor(socket);
-        }
+        parse();
     }
 
     public boolean isRun() {

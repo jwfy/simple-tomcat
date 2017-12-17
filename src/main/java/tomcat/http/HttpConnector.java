@@ -5,14 +5,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tomcat.Connector;
 import tomcat.Container;
-import tomcat.LifecycleListener;
-import tomcat.LifecycleState;
 import tomcat.core.LifecycleBase;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Stack;
+import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by junhong on 17/9/7.
@@ -25,18 +29,18 @@ public class HttpConnector extends LifecycleBase implements Runnable, Connector{
 
     private Logger logger = LoggerFactory.getLogger(HttpConnector.class);
 
-    private ServerSocket serverSocket;
-
     private int port;
-
-    private int processorNum = 0;
 
     private Container container;
 
     private boolean isAccept = true;
 
-    private Stack<HttpProcessor> processorStack = new Stack<HttpProcessor>();
-    // 默认的启动2个HttpProcessor
+    private ServerSocketChannel serverSocketChannel;
+
+    private Selector selector;
+
+    private ThreadPoolExecutor executor = new ThreadPoolExecutor(6, 6, 0L,
+            TimeUnit.SECONDS, new ArrayBlockingQueue(200));
 
     public boolean isAccept() {
         return isAccept;
@@ -49,10 +53,18 @@ public class HttpConnector extends LifecycleBase implements Runnable, Connector{
     public HttpConnector(int port) {
         this.port = port;
         try {
-            serverSocket = new ServerSocket(port);
+            selector = Selector.open();
+
+            serverSocketChannel = ServerSocketChannel.open();
+            serverSocketChannel.socket().bind(new InetSocketAddress(port));
+            serverSocketChannel.configureBlocking(false);
+
+            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     @Override
@@ -66,40 +78,43 @@ public class HttpConnector extends LifecycleBase implements Runnable, Connector{
     }
 
     @Override
-    public HttpRequest createRequest() {
-        HttpRequest httpRequest = new HttpRequest();
-        httpRequest.setConnector(this);
-        return httpRequest;
-    }
-
-    @Override
-    public HttpResponse createResponse() {
-        HttpResponse httpResponse = new HttpResponse();
-        httpResponse.setConnector(this);
-        return httpResponse;
-    }
-
-    @Override
     public void run() {
         while (isAccept){
             // TODO: 17/9/10 这个isAccept能否采用java的钩子去进行优雅关闭
-            Socket socket = null;
-
             try {
-                socket = serverSocket.accept();
+                int count = selector.select();
+                if(count <=0) {
+                    continue;
+                }
+
+                Iterator it = selector.selectedKeys().iterator();
+                while (it.hasNext()){
+                    SelectionKey selectionKey = (SelectionKey)it.next();
+                    it.remove();
+                    if(selectionKey.isAcceptable()){
+                        ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectionKey.channel();
+                        SocketChannel socketChannel = serverSocketChannel.accept();
+                        socketChannel.configureBlocking(false);
+                        socketChannel.register(selector, SelectionKey.OP_READ);
+                    }
+                    if(selectionKey.isReadable()){
+                        SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
+                        createProcessor(socketChannel);
+                        socketChannel.register(selector, SelectionKey.OP_WRITE);
+
+                        selectionKey.cancel();
+                    }
+                }
+
             } catch (IOException e) {
-                // TODO: 17/9/10 需要打印日志
-                continue;
+                e.printStackTrace();
             }
 
-            // 把socket交给HttpProcessor处理,他会生成对于的HttpResponse和HttpRequest
-            HttpProcessor httpProcessor = createProcessor();
-            httpProcessor.assign(socket);
         }
 
-        if(serverSocket != null){
+        if(serverSocketChannel != null){
             try {
-                serverSocket.close();
+                serverSocketChannel.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -111,41 +126,16 @@ public class HttpConnector extends LifecycleBase implements Runnable, Connector{
         thread.start();
     }
 
-    private void newProcessor(){
-        int i = 2;
-        while (i-- > 0){
-            HttpProcessor httpProcessor = new HttpProcessor(this);
-            // 这时候还什么都没做,就是创建了个新的对象吧
-            processorStack.push(httpProcessor);
-        }
-    }
 
-    private HttpProcessor createProcessor(){
-        HttpProcessor httpProcessor = null;
-
-        if(processorStack.isEmpty())
-            httpProcessor = new HttpProcessor(this);
-        else
-            httpProcessor = (HttpProcessor)processorStack.pop();
-        boolean isRun = httpProcessor.isRun();
-        if(!isRun){
-            new Thread(httpProcessor, "HttpProcessor-" + processorNum).start();
-            processorNum++;
-            // TODO: 17/9/17 可以加上对processor处理的请求数做一个统计
-        }
-        return httpProcessor;
+    private void createProcessor(SocketChannel socketChannel){
+        HttpProcessor httpProcessor = new HttpProcessor(socketChannel);
+        executor.submit(httpProcessor);
     }
 
     @Override
-    public void cycleProcessor(HttpProcessor processor){
-        processorStack.push(processor);
-        // 回收能够接受请求的processor
-    }
-
     public void start(){
         // TODO: 17/9/10 书上说这时候还会有生命周期的操作和判断
         httpConnectorThread();
-        newProcessor();
     }
 
     @Override
