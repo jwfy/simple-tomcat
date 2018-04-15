@@ -14,6 +14,8 @@ public class Catalina {
     private Thread shutdownHook = null;
 
     public void start(){
+        String userDir = System.getProperty("user.dir");
+        System.out.println("userDir:" + userDir);
 
         LifecycleListener listener = new SimpleListener();
 

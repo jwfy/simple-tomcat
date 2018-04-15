@@ -1,16 +1,23 @@
 package tomcat.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tomcat.*;
-import tomcat.http.HttpRequest;
-import tomcat.http.HttpResponse;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import tomcat.Container;
+import tomcat.Context;
+import tomcat.Pipeline;
+import tomcat.Service;
+import tomcat.Wrapper;
+import tomcat.common.WebXmlParse;
+import tomcat.http.HttpRequest;
+import tomcat.http.HttpResponse;
 
 /**
  * Created by junhong on 17/9/16.
@@ -40,6 +47,9 @@ public class StandardContext extends LifecycleBase implements Context {
         this.pipeline.setBasicValve(new StandardContextValve());
         this.child = new HashMap<>();
         this.servletMap = new HashMap<>();
+
+        // 解析web.xml 文件获取其中的配置属性
+        WebXmlParse.parse(this);
     }
 
     @Override

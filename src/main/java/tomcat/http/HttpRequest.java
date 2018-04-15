@@ -1,11 +1,11 @@
 package tomcat.http;
 
-import tomcat.Connector;
-import tomcat.Container;
-import tomcat.manager.MappingData;
-
-import javax.servlet.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -13,12 +13,26 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import tomcat.Connector;
+import tomcat.Container;
+import tomcat.manager.MappingData;
+
 /**
  * Created by junhong on 17/9/3.
  */
 public class HttpRequest implements ServletRequest {
 
-    private InputStream inputStream;
+    private SocketChannel socketChannel;
+    private Charset charset = Charset.forName("utf-8");
+
     private String protocol;   // HTTP/1.1
     private String uri;        // test.com
     private String method;          // GET
@@ -46,8 +60,8 @@ public class HttpRequest implements ServletRequest {
         this.container = container;
     }
 
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+    public void setSocketChannel(SocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
     }
 
     public String getProtocol() {
@@ -66,20 +80,38 @@ public class HttpRequest implements ServletRequest {
         return requestHead;
     }
 
+    private String getRequestContext(){
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            while (socketChannel.read(byteBuffer) >0){
+                byteBuffer.flip();
+                sb.append(charset.decode(byteBuffer));
+            }
+
+            return sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * 解析inputStream
      */
     public void parse() throws Exception {
-        InputStreamReader inr = new InputStreamReader(inputStream, "utf-8");
-        BufferedReader bufferedReader = new BufferedReader(inr);
 
-        String head = bufferedReader.readLine();
-        parseRequest(head);
+        String requestContext = getRequestContext();
+        if(requestContext == null || requestContext.length() <=0){
+            return;
+        }
+        String[] heads = requestContext.split("\r\n");
+        parseHead(heads[0]);
 
-        String currentLine = null;
-        while (!(currentLine = bufferedReader.readLine()).isEmpty()){
+        for(int i =1; i< heads.length; i++){
             Pattern pattern = Pattern.compile(parament_re);
-            Matcher matcher = pattern.matcher(currentLine);
+            Matcher matcher = pattern.matcher(heads[i]);
 
             if(matcher.find()){
                 String name = matcher.group(1);
@@ -87,9 +119,11 @@ public class HttpRequest implements ServletRequest {
                 this.requestHead.put(name, value);
             }
         }
+
+
     }
 
-    private void parseRequest(String head) throws Exception {
+    private void parseHead(String head) throws Exception {
         // 解析 GET TEST HTTP/1.1
         if(head == null || head.length() <= 0)
             throw new NullPointerException("head is invalid");

@@ -1,14 +1,15 @@
 package tomcat.http;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tomcat.Connector;
-import tomcat.Container;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import tomcat.Connector;
+import tomcat.Container;
 
 /**
  * Created by junhong on 17/9/7.
@@ -21,18 +22,13 @@ public class HttpProcessor implements Runnable {
 
     private Container container;
 
-    private boolean available = false;
-
     private SocketChannel socketChannel;
 
     private boolean isRun = false; // 判断其是否处于运行状态
 
-    public HttpProcessor(Connector connector) {
+    public HttpProcessor(Connector connector, SocketChannel socketChannel) {
         this.connector = connector;
         this.container = connector.getContainer();
-    }
-
-    public HttpProcessor(SocketChannel socketChannel) {
         this.socketChannel = socketChannel;
     }
 
@@ -71,7 +67,33 @@ public class HttpProcessor implements Runnable {
 
     @Override
     public void run() {
-        parse();
+        if(socketChannel == null){
+            logger.error("error socker channel");
+            return;
+        }
+
+        try {
+            HttpRequest httpRequest = new HttpRequest();
+            httpRequest.setSocketChannel(socketChannel);
+            HttpResponse httpResponse = new HttpResponse();
+            httpResponse.setHttpRequest(httpRequest);
+            httpRequest.parse();
+
+            parse();
+
+            /*
+            String url = httpRequest.getUri();
+            if(url.endsWith("ico") || url.endsWith("gif") || url.endsWith("jpg")) {
+                logger.error("processor don't deal url:{}", url);
+            }else {
+                Mapper.mapWrapper(httpRequest);
+                container.invoke(httpRequest, httpResponse);
+            }
+            */
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isRun() {

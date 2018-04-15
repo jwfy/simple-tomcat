@@ -1,12 +1,6 @@
 package tomcat.http;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tomcat.Connector;
-import tomcat.Container;
-import tomcat.core.LifecycleBase;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -17,6 +11,13 @@ import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import tomcat.Connector;
+import tomcat.Container;
+import tomcat.core.LifecycleBase;
 
 /**
  * Created by junhong on 17/9/7.
@@ -128,7 +129,7 @@ public class HttpConnector extends LifecycleBase implements Runnable, Connector{
 
 
     private void createProcessor(SocketChannel socketChannel){
-        HttpProcessor httpProcessor = new HttpProcessor(socketChannel);
+        HttpProcessor httpProcessor = new HttpProcessor(this, socketChannel);
         executor.submit(httpProcessor);
     }
 

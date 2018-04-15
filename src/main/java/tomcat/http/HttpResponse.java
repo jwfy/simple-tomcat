@@ -6,18 +6,18 @@ import tomcat.Container;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Iterator;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created by junhong on 17/9/3.
  */
 public class HttpResponse implements ServletResponse {
 
-    private OutputStream outputStream;
+    private SocketChannel socketChannel;
+    private Charset charset = Charset.forName("utf-8");
     private HttpRequest httpRequest;
 
     private Connector connector;
@@ -43,8 +43,8 @@ public class HttpResponse implements ServletResponse {
         this.container = container;
     }
 
-    public void setOutputStream(OutputStream outputStream) {
-        this.outputStream = outputStream;
+    public void setSocketChannel(SocketChannel socketChannel) {
+        this.socketChannel = socketChannel;
     }
 
     public void setHttpRequest(HttpRequest httpRequest) {
@@ -68,8 +68,8 @@ public class HttpResponse implements ServletResponse {
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        PrintWriter printWriter = new PrintWriter(this.outputStream, true);
-        return printWriter;
+
+        return null;
     }
 
     @Override

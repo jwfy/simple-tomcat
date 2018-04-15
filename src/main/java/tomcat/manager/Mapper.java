@@ -14,7 +14,9 @@ import tomcat.http.HttpRequest;
 public class Mapper {
 
     /**
-     * 根据uri规则选择最合适的容器r去执行
+     * 根据uri规则选择最合适的容器去执行
+     *
+     * TODO 这一块需要配置xml实现，或者实现一套类似的注解的方案
      * @param request
      */
     public static void mapWrapper(HttpRequest request) throws Exception {
